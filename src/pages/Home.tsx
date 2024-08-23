@@ -10,8 +10,10 @@ import {
   Image,
   Button
 } from 'react-native';
-import React, { useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { NavigationContainer, useNavigationContainerRef } from '@react-navigation/native';
+import { createTable, deleteTable, getDBConnection, getProducts, saveTodoItems } from '../services/db-service';
+import { Product } from '../models/Product';
 
 const productsList = [
   {
@@ -38,15 +40,44 @@ const productsList = [
 ];
 
 const Home = ({navigation}) => {
-  const [products, setProducts] = useState(productsList);
+  const [products, setProducts] = useState<Product[]>([]);
+
+  const loadDataCallback = useCallback(async () => {
+    try {
+      const initProducts = [
+        { id: 1, name: 'Leche de Almendras', brand:'Colanta', nova: 3, diabetes_risk: 'Alto', date: '07-20-2024' }, 
+        { id: 2, name: 'Chocorramo', nova: 2, brand:'Ramo', diabetes_risk: 'Medio', date: '04-06-2024' }, 
+        { id: 3, name: 'Leche Entera', nova: 1, brand:'Alqueria', diabetes_risk: 'Bajo', date: '02-04-2024' }, 
+      ];
+      const db = await getDBConnection();
+      // await deleteTable(db);
+      await createTable(db);
+      const storedProducts = await getProducts(db);
+      console.log('Products:');
+      console.log(storedProducts);
+      if (storedProducts.length) {
+        setProducts(storedProducts);
+      } else {
+        await saveTodoItems(db, initProducts);
+        setProducts(initProducts);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadDataCallback();
+  }, [loadDataCallback]);
+
   return(
       <View style={styles.container}>
         {products.length > 0 ? (
           <ScrollView contentContainerStyle={styles.content}>
             {products.map(
-              ({ id, name, dates, level, nova }, index) => {
+              ({ id, name, date, diabetes_risk, nova }, index) => {
                 return (
-                <View style={styles.card} key={id}>
+                <View style={styles.card} key={index}>
                   <View style={styles.cardColumnOne}>
                     <Image
                       style={styles.imageIconProduct}
@@ -59,8 +90,8 @@ const Home = ({navigation}) => {
                     <Text style={styles.novaText}>Nova { nova }</Text>
                   </View>
                   <View style={styles.cardColumnThree}>
-                    <Text style={styles.dateText}>{ dates }</Text>
-                    <Text style={[styles.levelText, level === 'Alto' ? styles.redText : level === 'Medio' ? styles.orangeText : styles.greenText ]} >{ level }</Text>
+                    <Text style={styles.dateText}>{ date }</Text>
+                    <Text style={[styles.levelText, diabetes_risk === 'Alto' ? styles.redText : diabetes_risk === 'Medio' ? styles.orangeText : styles.greenText ]} >{ diabetes_risk }</Text>
                   </View>
                 </View>
                 );
@@ -80,7 +111,6 @@ const Home = ({navigation}) => {
       </View>
   );
 }
-
 
 const styles = StyleSheet.create({
   container: {

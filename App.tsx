@@ -37,7 +37,7 @@ function MyTabs() {
         tabBarActiveBackgroundColor: '#eeeeee',
       })}
     >
-      <Tab.Screen name="Inicio" component={ HomeScreen } options={{
+      <Tab.Screen name="home" component={ HomeScreen } options={{
         tabBarLabel: 'Inicio',
         tabBarIcon: ({ focused, color, size }) => {
           if(focused){
