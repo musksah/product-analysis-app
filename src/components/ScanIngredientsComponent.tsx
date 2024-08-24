@@ -4,13 +4,11 @@ import {
   StyleSheet,
   Text,
   View,
-  Button,
   Image,
-  TouchableOpacity
+  TouchableOpacity,
+  Pressable
 } from 'react-native';
-import axios from 'axios';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { useNavigation } from '@react-navigation/native';
 
 const URL_API = 'https://3630-186-155-13-3.ngrok-free.app';
 
@@ -21,15 +19,18 @@ const ScanIngredientsComponent = ({navigation}) => {
   const camera = useRef<Camera>(null);
   const [capturedPhoto, setCapturedPhoto] = useState(null);
   const [showPreview, setShowPreview] = useState(false);
+  const [cameraActive, setCameraActive] = useState(true);
 
   useEffect(() => {
       checkCameraPermission();
+      return () => {
+        // Cleanup function to run when the component unmounts
+        setCameraActive(false);
+      };
     }, []);
 
   const checkCameraPermission = async () => {
       const status = await Camera.getCameraPermissionStatus();
-      console.log('status',status);
-      console.log('statuscheck> ', status === 'denied');
 
       if (status === 'granted') {
         setCameraPermission(true);
@@ -43,30 +44,12 @@ const ScanIngredientsComponent = ({navigation}) => {
 
   const uploadPhoto = async () => {
     if (capturedPhoto) {
-      const formData = new FormData();
-      formData.append('file', {
-        uri: capturedPhoto,
-        name: 'temp_image.jpg',
-        type: 'image/jpeg',
-      });
-
-      // try {
-      //   const response = await axios.post(`${URL_API}/process_ingredients/`, formData, {
-      //     headers: {
-      //       'Content-Type': 'multipart/form-data',
-      //     },
-      //   });
-      //   console.log('Response:', response.data);
-      // } catch (error) {
-      //   console.error('Error uploading photo:', error);
-      // }
+      setTimeout(() => {
+        setCameraActive(false);
+      }, 0);
       navigation.navigate('ScanNutritionalFacts',{
-        state: {
-          photo: capturedPhoto
-        }
+          photoIngredientsPath: capturedPhoto
       });
-    } else {
-      console.log('No photo to upload');
     }
   };
 
@@ -87,7 +70,6 @@ const ScanIngredientsComponent = ({navigation}) => {
           return;
         }
         const photo = await camera.current.takePhoto();
-        console.log(photo);
         if (photo) {
           setCapturedPhoto(`file://${photo.path}`);
           setShowPreview(true);
@@ -112,23 +94,29 @@ const ScanIngredientsComponent = ({navigation}) => {
 
   return (
       <View style={{ flex: 1 }}>
+        {cameraActive && device ? (
         <Camera
           style={{ flex: 1 }}
           device={device}
-          isActive={true}
+          isActive={cameraActive}
           ref={(ref) => onCameraReady(ref)}
           photo={true}
           video={true}
         />
+        ) : null}
          {showPreview && capturedPhoto ? (
-          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', paddingTop:20, paddingBottom:20 }}>
             <Image
               source={{ uri: capturedPhoto }} // Assuming the photo is a valid URI
-              style={{ width: 300, height: 300, marginBottom: 20 }}
+              style={{ width: 300, height: 300, marginBottom: 10 }}
             />
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-              <Button title="Retake" onPress={retakePhoto} />
-              <Button title="Confirmar" onPress={uploadPhoto} />
+            <View style={{ display: 'flex', flexDirection: 'row', gap: 10 }}>
+              <Pressable onPress={retakePhoto} style={[styles.button, styles.buttonRetake]}>
+                <Text style={styles.textButton}>Corregir Foto</Text>
+              </Pressable>
+              <Pressable onPress={uploadPhoto} style={[styles.button, styles.buttonComfirm]}>
+                <Text style={styles.textButton}>Continuar</Text>
+              </Pressable>
             </View>
           </View>
         ) : (
@@ -159,7 +147,23 @@ const styles = StyleSheet.create({
     bottom: 30,
     backgroundColor: '#55AD9B',
     borderRadius: 50
-  }
+  },
+  button: {
+    borderRadius: 5,
+    padding: 17,
+    paddingBottom: 14,
+    paddingTop: 14,
+  },
+  buttonRetake:{
+    backgroundColor: '#444444'
+  },
+  buttonComfirm:{
+    backgroundColor: '#0a6801'
+  },
+  textButton:{
+    color: 'white',
+    fontWeight: 'bold'
+  },
 });
 
 export default ScanIngredientsComponent;

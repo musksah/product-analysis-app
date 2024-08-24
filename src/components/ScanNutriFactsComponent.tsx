@@ -4,29 +4,33 @@ import {
   StyleSheet,
   Text,
   View,
-  Button,
   Image,
   TouchableOpacity,
   SafeAreaView,
-  ActivityIndicator 
+  ActivityIndicator,
+  Pressable 
 } from 'react-native';
 import axios from 'axios';
 import Icon from 'react-native-vector-icons/Ionicons';
 
-const URL_API = 'https://5f3f-186-155-13-3.ngrok-free.app';
+const URL_API = 'https://b736-186-155-13-3.ngrok-free.app';
 
 const ScanNutriFactsComponent = ({route, navigation}) => {
-  const { photo } = route.params;
+  const { photoIngredientsPath } = route.params;
   const [cameraPermission, setCameraPermission] = useState(null);
   const device = useCameraDevice('back'); // Set the initial camera device
   const camera = useRef<Camera>(null);
   const [capturedPhoto, setCapturedPhoto] = useState(null);
   const [showPreview, setShowPreview] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [modalVisible, setModalVisible] = useState(false);
+  const [cameraActive, setCameraActive] = useState(true);
 
   useEffect(() => {
       checkCameraPermission();
+      return () => {
+        // Cleanup function to run when the component unmounts
+        setCameraActive(false);
+      };
     }, []);
 
   const checkCameraPermission = async () => {
@@ -43,36 +47,37 @@ const ScanNutriFactsComponent = ({route, navigation}) => {
   };
 
   const uploadPhoto = async () => {
-    if (capturedPhoto) {
+    if (capturedPhoto || photoIngredientsPath) {
       const formData = new FormData();
-      formData.append('file', {
-        uri: capturedPhoto,
-        name: 'temp_image.jpg',
+      formData.append('files', {
+        uri: photoIngredientsPath,
+        name: 'ingredients_img.jpg',
         type: 'image/jpeg',
       });
-
-      // try {
-      //   const response = await axios.post(`${URL_API}/uploadfile/`, formData, {
-      //     headers: {
-      //       'Content-Type': 'multipart/form-data',
-      //     },
-      //   });
-      //   console.log('Response:', response.data);
-      // } catch (error) {
-      //   console.error('Error uploading photo:', error);
-      // }
+      formData.append('files', {
+        uri: capturedPhoto,
+        name: 'nutrifacts_img.jpg',
+        type: 'image/jpeg',
+      });
       setLoading(true);
-      setTimeout(() => {
-        setLoading(false);
-        navigation.navigate('Review',{
-          state: {
-            photoNutritionFacts: capturedPhoto
-          }
+      try {
+        const response = await axios.post(`${URL_API}/process_images/`, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
         });
-      }, 3000);
-      
-    } else {
-      console.log('No photo to upload');
+        setLoading(false);
+        console.log('Response:', response.data);
+        setTimeout(() => {
+          setCameraActive(false);
+        }, 0);
+        navigation.navigate('Review',{
+          product: response.data
+        });
+      } catch (error) {
+        setLoading(false);
+        console.error('Error uploading photo:', error);
+      }      
     }
   };
 
@@ -92,9 +97,7 @@ const ScanNutriFactsComponent = ({route, navigation}) => {
           console.error('Camera reference not available.', camera);
           return;
         }
-
         const photo = await camera.current.takePhoto();
-        console.log(photo);
 
         if (photo) {
           setCapturedPhoto(`file://${photo.path}`);
@@ -124,6 +127,7 @@ const ScanNutriFactsComponent = ({route, navigation}) => {
         <ActivityIndicator size="large" style={{ transform: [{ scaleX: 2 }, { scaleY: 2 }] }} color="#0a6801" />
       ) : (
         <>
+          {cameraActive && device ? (
           <Camera
             style={{ flex: 1 }}
             device={device}
@@ -132,15 +136,20 @@ const ScanNutriFactsComponent = ({route, navigation}) => {
             photo={true}
             video={true}
           />
+          ) : null}
           {showPreview && capturedPhoto ? (
-            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', paddingTop:20, paddingBottom:20 }}>
               <Image
                 source={{ uri: capturedPhoto }} // Assuming the photo is a valid URI
-                style={{ width: 300, height: 300, marginBottom: 20 }}
+                style={{ width: 300, height: 300, marginBottom: 10 }}
               />
-              <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                <Button title="Retake" onPress={retakePhoto} />
-                <Button title="Upload" onPress={uploadPhoto} />
+              <View style={{ display: 'flex', flexDirection: 'row', gap: 10 }}>
+                <Pressable onPress={retakePhoto} style={[styles.button, styles.buttonRetake]}>
+                  <Text style={styles.textButton}>Corregir Foto</Text>
+                </Pressable>
+                <Pressable onPress={uploadPhoto} style={[styles.button, styles.buttonComfirm]}>
+                  <Text style={styles.textButton}>Procesar Fotos</Text>
+                </Pressable>
               </View>
             </View>
           ) : (
@@ -173,7 +182,23 @@ const styles = StyleSheet.create({
     bottom: 30,
     backgroundColor: '#55AD9B',
     borderRadius: 50
-  }
+  },
+  button: {
+    borderRadius: 5,
+    padding: 17,
+    paddingBottom: 14,
+    paddingTop: 14,
+  },
+  buttonRetake:{
+    backgroundColor: '#444444'
+  },
+  buttonComfirm:{
+    backgroundColor: '#0a6801'
+  },
+  textButton:{
+    color: 'white',
+    fontWeight: 'bold'
+  },
 });
 
 export default ScanNutriFactsComponent;

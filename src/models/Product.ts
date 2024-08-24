@@ -1,10 +1,5 @@
-export type ToDoItem = {
-    id: number;
-    value: string;
-};
-
 export type Product = {
-    id: number;
+    id?: number;
     name: string;
     brand: string;
     nova: number;

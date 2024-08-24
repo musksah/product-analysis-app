@@ -11,11 +11,9 @@ import ReviewScreen from './src/pages/Review.tsx';
 import ScanNutriFactsScreen from './src/components/ScanNutriFactsComponent.tsx';
 import {
   NavigationContainer,
-  useNavigationContainerRef,
 } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Text, View } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 const Tab = createBottomTabNavigator();

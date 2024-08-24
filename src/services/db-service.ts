@@ -13,6 +13,7 @@ export const createTable = async (db: SQLiteDatabase) => {
   // create table if not exists
   const query = `
     CREATE TABLE IF NOT EXISTS ${tableName}(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
         brand TEXT NOT NULL,
         nova INTEGER NOT NULL,
@@ -40,13 +41,13 @@ export const getProducts = async (db: SQLiteDatabase): Promise<Product[]> => {
 
 export const saveTodoItems = async (db: SQLiteDatabase, products: Product[]) => {
   const insertQuery =
-    `INSERT OR REPLACE INTO ${tableName}(rowid, name, brand, nova, diabetes_risk, date) values` +
-    products.map(i => `(${i.id}, '${i.name}', '${i.brand}', ${i.nova}, '${i.diabetes_risk}', '${i.date}')`).join(',');
+    `INSERT OR REPLACE INTO ${tableName}(name, brand, nova, diabetes_risk, date) values` +
+    products.map(i => `('${i.name}', '${i.brand}', ${i.nova}, '${i.diabetes_risk}', '${i.date}')`).join(',');
   return db.executeSql(insertQuery);
 };
 
 export const deleteTodoItem = async (db: SQLiteDatabase, id: number) => {
-  const deleteQuery = `DELETE from ${tableName} where rowid = ${id}`;
+  const deleteQuery = `DELETE from ${tableName} where id = ${id}`;
   await db.executeSql(deleteQuery);
 };
 

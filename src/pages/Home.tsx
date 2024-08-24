@@ -3,63 +3,21 @@ import {
   ScrollView,
   Text,
   StyleSheet,
-  TextInput,
-  Pressable,
-  FlatList,
-  ActivityIndicator,
   Image,
-  Button
 } from 'react-native';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { NavigationContainer, useNavigationContainerRef } from '@react-navigation/native';
-import { createTable, deleteTable, getDBConnection, getProducts, saveTodoItems } from '../services/db-service';
+import React, { useCallback, useEffect, useState } from 'react';
+import { getDBConnection, getProducts } from '../services/db-service';
 import { Product } from '../models/Product';
-
-const productsList = [
-  {
-    id: 1,
-    name: 'Aceite',
-    dates: '08/02/2024',
-    level: 'Alto',
-    nova: 1,
-  },
-  {
-    id: 2,
-    name: 'Kellogs',
-    dates: '10/02/2024',
-    level: 'Medio',
-    nova: 2,
-  },
-  {
-    id: 3,
-    name: 'Milo',
-    dates: '09/02/2024',
-    level: 'Bajo',
-    nova: 3,
-  }
-];
 
 const Home = ({navigation}) => {
   const [products, setProducts] = useState<Product[]>([]);
 
   const loadDataCallback = useCallback(async () => {
     try {
-      const initProducts = [
-        { id: 1, name: 'Leche de Almendras', brand:'Colanta', nova: 3, diabetes_risk: 'Alto', date: '07-20-2024' }, 
-        { id: 2, name: 'Chocorramo', nova: 2, brand:'Ramo', diabetes_risk: 'Medio', date: '04-06-2024' }, 
-        { id: 3, name: 'Leche Entera', nova: 1, brand:'Alqueria', diabetes_risk: 'Bajo', date: '02-04-2024' }, 
-      ];
       const db = await getDBConnection();
-      // await deleteTable(db);
-      await createTable(db);
       const storedProducts = await getProducts(db);
-      console.log('Products:');
-      console.log(storedProducts);
       if (storedProducts.length) {
         setProducts(storedProducts);
-      } else {
-        await saveTodoItems(db, initProducts);
-        setProducts(initProducts);
       }
     } catch (error) {
       console.error(error);
@@ -67,8 +25,10 @@ const Home = ({navigation}) => {
   }, []);
 
   useEffect(() => {
-    loadDataCallback();
-  }, [loadDataCallback]);
+    navigation.addListener('focus', () => {
+      loadDataCallback();
+    });
+  }, [navigation]);
 
   return(
       <View style={styles.container}>

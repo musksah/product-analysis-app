@@ -1,29 +1,49 @@
 import { View, ScrollView, Text, StyleSheet, Button, Image, Modal, Alert, Pressable, TextInput } from 'react-native';
 import React, { useState } from 'react';
 import { getDBConnection, saveTodoItems } from '../services/db-service';
-import { Product } from '../models/Product';
 
 const product_example = {
     id: 7,
-    name: 'chocorramo',
-    brand: 'Ramo',
-    nova: 1,
+    name: 'Coca cola',
+    brand: 'Coca cola',
+    nova: 4,
     diabetes_risk: 'Alto',
     date: '07-21-2024'
 }
 
-const Review = ({navigation}) => {
+const Review = ({route, navigation}) => {
+    const { product } = route.params;
     const [textProduct, onChangeTextProduct] = useState('');
-    const [product, setProduct] = useState<Product>(product_example);
+    const [textBrand, onChangeTextBrand] = useState('');
+    // const [product, setProduct] = useState<Product>(product_example);
     const [modalVisible, setModalVisible] = useState(false);
+    const [nameError, setNameError] = useState<string | null>('');
+    
     const completeProcess = async () =>{
         navigation.navigate('home');
     }
 
     const SaveProduct = async () =>{
+        if (textProduct.trim() === '') {
+            setNameError('El nombre es requerido.')
+            return;
+        } else {
+            setNameError(null)
+        }
+
+        const date = new Date();
+        const formattedDate = `${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}-${date.getFullYear()}`;
+        const new_product = {
+            name: textProduct,
+            brand: textBrand,
+            nova: product.nova,
+            diabetes_risk: product.diabetes_risk,
+            date: formattedDate
+        }
         const db = await getDBConnection();
-        console.log()
-        // await saveTodoItems(db, initProducts);
+        await saveTodoItems(db, [new_product]);
+        setModalVisible(!modalVisible);
+        navigation.navigate('home');
     }
 
     return(
@@ -74,27 +94,38 @@ const Review = ({navigation}) => {
                 setModalVisible(!modalVisible);
             }}>
                 <View style={styles.centeredView}>
-                <View style={styles.modalView}>
-                    <Text style={styles.modalText}>Quieres guardar el producto?</Text>
-                    <TextInput
-                        style={styles.input}
-                        onChangeText={onChangeTextProduct}
-                        value={textProduct}
-                        placeholder="Digita el nombre del producto"
-                    />
-                    <View style={styles.buttonModalContainer}>
-                        <Pressable
-                            style={[styles.button, styles.buttonClose]}
-                            onPress={completeProcess}>
-                            <Text style={styles.textStyle}>No, continuar</Text>
-                        </Pressable>
-                        <Pressable
-                            style={[styles.button, styles.buttonSave]}
-                            onPress={() => setModalVisible(!modalVisible)}>
-                            <Text style={styles.textStyle}>Guardar</Text>
-                        </Pressable>
+                    <View style={styles.modalView}>
+                        <Text style={styles.modalText}>Quieres guardar el producto?</Text>
+                        <TextInput
+                            style={styles.input}
+                            onChangeText={onChangeTextProduct}
+                            value={textProduct}
+                            placeholder="Digita el nombre del producto"
+                        />
+                        {(!!nameError && textProduct.length === 0) && (
+                            <View style={{ width: '100%', marginTop: 0 }}>
+                                <Text style={{ color: "red", textAlign: 'left', left: 5 }}>{nameError}</Text>
+                            </View>
+                        )}
+                        <TextInput
+                            style={styles.input}
+                            onChangeText={onChangeTextBrand}
+                            value={textBrand}
+                            placeholder="Digita la marca (opcional)"
+                        />
+                        <View style={styles.buttonModalContainer}>
+                            <Pressable
+                                style={[styles.button, styles.buttonClose]}
+                                onPress={completeProcess}>
+                                <Text style={styles.textStyle}>No, solo continuar</Text>
+                            </Pressable>
+                            <Pressable
+                                style={[styles.button, styles.buttonSave]}
+                                onPress={SaveProduct}>
+                                <Text style={styles.textStyle}>Guardar</Text>
+                            </Pressable>
+                        </View>
                     </View>
-                </View>
                 </View>
             </Modal>
         </View>
@@ -111,7 +142,6 @@ const styles = StyleSheet.create({
     },
     overlay:{
         flex: 1,
-        //backgroundColor: 'transparent',
         opacity: 0.3,
         backgroundColor: 'black',
         alignItems: 'center',
@@ -186,7 +216,7 @@ const styles = StyleSheet.create({
         marginTop: 22,
     },
     modalView: {
-        width: 270,
+        width: 280,
         backgroundColor: 'white',
         borderRadius: 5,
         padding: 16,
@@ -212,7 +242,8 @@ const styles = StyleSheet.create({
         display: 'flex',
         justifyContent: 'space-between',
         flexDirection: 'row',
-        gap: 10
+        gap: 10,
+        marginTop: 15
     },
     button: {
         borderRadius: 5,
@@ -239,7 +270,7 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         padding: 10,
         borderColor: '#b1b2b5',
-        marginBottom: 25
+        marginBottom: 10
     },
 });
 
