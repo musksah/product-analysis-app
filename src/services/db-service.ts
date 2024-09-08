@@ -17,7 +17,7 @@ export const createTable = async (db: SQLiteDatabase) => {
         name TEXT NOT NULL,
         brand TEXT NOT NULL,
         nova INTEGER NOT NULL,
-        diabetes_risk TEXT NOT NULL,
+        diabetes_impact TEXT NOT NULL,
         date TEXT NOT NULL
     );`;
   await db.executeSql(query);
@@ -26,7 +26,7 @@ export const createTable = async (db: SQLiteDatabase) => {
 export const getProducts = async (db: SQLiteDatabase): Promise<Product[]> => {
   try {
     const products: Product[] = [];
-    const results = await db.executeSql(`SELECT rowid as id, name, brand, nova, diabetes_risk, date FROM ${tableName}`);
+    const results = await db.executeSql(`SELECT rowid as id, name, brand, nova, diabetes_impact, date FROM ${tableName}`);
     results.forEach(result => {
       for (let index = 0; index < result.rows.length; index++) {
         products.push(result.rows.item(index))
@@ -41,8 +41,8 @@ export const getProducts = async (db: SQLiteDatabase): Promise<Product[]> => {
 
 export const saveTodoItems = async (db: SQLiteDatabase, products: Product[]) => {
   const insertQuery =
-    `INSERT OR REPLACE INTO ${tableName}(name, brand, nova, diabetes_risk, date) values` +
-    products.map(i => `('${i.name}', '${i.brand}', ${i.nova}, '${i.diabetes_risk}', '${i.date}')`).join(',');
+    `INSERT OR REPLACE INTO ${tableName}(name, brand, nova, diabetes_impact, date) values` +
+    products.map(i => `('${i.name}', '${i.brand}', ${i.nova}, '${i.diabetes_impact}', '${i.date}')`).join(',');
   return db.executeSql(insertQuery);
 };
 

@@ -1,13 +1,14 @@
 import { View, ScrollView, Text, StyleSheet, Button, Image, Modal, Alert, Pressable, TextInput } from 'react-native';
 import React, { useState } from 'react';
 import { getDBConnection, saveTodoItems } from '../services/db-service';
+import { Novas, SugarLevels } from '../shared/messages';
 
 const product_example = {
     id: 7,
     name: 'Coca cola',
     brand: 'Coca cola',
     nova: 4,
-    diabetes_risk: 'Alto',
+    diabetes_impact: 'Alto',
     date: '07-21-2024'
 }
 
@@ -15,7 +16,6 @@ const Review = ({route, navigation}) => {
     const { product } = route.params;
     const [textProduct, onChangeTextProduct] = useState('');
     const [textBrand, onChangeTextBrand] = useState('');
-    // const [product, setProduct] = useState<Product>(product_example);
     const [modalVisible, setModalVisible] = useState(false);
     const [nameError, setNameError] = useState<string | null>('');
     
@@ -37,7 +37,7 @@ const Review = ({route, navigation}) => {
             name: textProduct,
             brand: textBrand,
             nova: product.nova,
-            diabetes_risk: product.diabetes_risk,
+            diabetes_impact: product.diabetes_impact,
             date: formattedDate
         }
         const db = await getDBConnection();
@@ -46,16 +46,44 @@ const Review = ({route, navigation}) => {
         navigation.navigate('home');
     }
 
+    const renderNovaDescription = (nova_value: number) => {
+        switch (nova_value) {
+          case 1:
+            return <Text><Text style={{ fontSize: 14, color: '#3d3d3d', fontWeight: 'bold' }}></Text>{Novas.nova_1}</Text>;
+          case 2:
+            return <Text><Text style={{ fontSize: 14, color: '#3d3d3d', fontWeight: 'bold' }}></Text>{Novas.nova_2}</Text>;
+          case 3:
+            return <Text><Text style={{ fontSize: 14, color: '#3d3d3d', fontWeight: 'bold' }}></Text>{Novas.nova_3}</Text>;
+          case 4:
+            return <Text><Text style={{ fontSize: 14, color: '#3d3d3d', fontWeight: 'bold' }}></Text>{Novas.nova_4}</Text>;
+          default:
+            return <Text></Text>;
+        }
+      };
+    
+      const renderSugarDescription = (sugarLevel:string) => {
+        switch (sugarLevel) {
+          case 'Alto':
+            return <Text><Text style={{ fontSize: 14, color: '#3d3d3d', fontWeight: 'bold' }}></Text>{ SugarLevels.alto }</Text>;
+          case 'Medio':
+            return <Text><Text style={{ fontSize: 14, color: '#3d3d3d', fontWeight: 'bold' }}></Text>{ SugarLevels.medio }</Text>;
+          case 'Bajo':
+            return <Text><Text style={{ fontSize: 14, color: '#3d3d3d', fontWeight: 'bold' }}></Text>{ SugarLevels.bajo }</Text>;
+          default:
+            return <Text></Text>;
+        }
+      };
+
     return(
         <View style={[styles.container, modalVisible ? styles.overlay: null]}> 
-            <ScrollView>
+            <ScrollView style={{ marginBottom: 70, paddingLeft: 16, paddingRight: 16 }}>
                 <View style={styles.cardContainer}>
                     <Text style={ styles.headerTitle } >Riesgo de Diabetes</Text>
                     <View style={styles.headerCard}>
-                        <Text style={[styles.headerValue, product.diabetes_risk === 'Alto' ?  styles.valueHigh : product.diabetes_risk === 'Medio' ? styles.valueMedium : styles.valueLow
+                        <Text style={[styles.headerValue, product.diabetes_impact === 'Alto' ?  styles.valueHigh : product.diabetes_impact === 'Medio' ? styles.valueMedium : styles.valueLow
                             
-                        ]}>{ product.diabetes_risk }</Text>
-                        {product.diabetes_risk === 'Alto' || product.diabetes_risk === 'Medio'   ? (
+                        ]}>{ product.diabetes_impact }</Text>
+                        {product.diabetes_impact === 'Alto' || product.diabetes_impact === 'Medio'   ? (
                             <Image
                                 style={styles.iconWarning}
                                 source={require('../img/warning-icon.png')}
@@ -66,7 +94,7 @@ const Review = ({route, navigation}) => {
                         />)}
                     </View>
                     <View style={styles.containerNote}>
-                        <Text><Text style={{ fontSize: 14, color: '#3d3d3d', fontWeight: 'bold' }}>Nota:</Text> la medida del riesgo de diabetes está basada en una evaluación del nivel procesado del producto y su nivel de ázucar, por lo que estos resultados no indican que los productos con un nivel alto no se puedan consumir sino que el alto consumo de estos productos, es factor importante para contraer diabetes.</Text>
+                        {renderSugarDescription(product.diabetes_impact)}
                     </View>
                 </View>
                 <View style={styles.cardContainer}>
@@ -75,7 +103,7 @@ const Review = ({route, navigation}) => {
                         <Text style={styles.headerValueNova}> Nova { product.nova }</Text>
                     </View>
                     <View style={styles.containerNoteNova}>
-                        <Text><Text style={{ fontSize: 14, color: '#3d3d3d', fontWeight: 'bold' }}>Nota:</Text> la medida del riesgo de diabetes está basada en una evaluación del nivel procesado del producto y su nivel de ázucar, por lo que estos resultados no indican que los productos con un nivel alto no se puedan consumir sino que el alto consumo de estos productos, es factor importante para contraer diabetes.</Text>
+                        {renderNovaDescription(product.nova)}
                     </View>
                 </View>
                 
@@ -134,7 +162,6 @@ const Review = ({route, navigation}) => {
 
 const styles = StyleSheet.create({
     container:{
-        padding: 16,
         paddingTop: 0,
         paddingBottom: 0,
         flex: 1,
@@ -206,8 +233,8 @@ const styles = StyleSheet.create({
         display: 'flex',
         justifyContent: 'center',
         bottom: 16,
-        marginLeft: 16,
-        marginRight: 16
+        paddingLeft: 16,
+        paddingRight: 16
     },
     centeredView: {
         flex: 1,

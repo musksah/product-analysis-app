@@ -3,6 +3,6 @@ export type Product = {
     name: string;
     brand: string;
     nova: number;
-    diabetes_risk: string;
+    diabetes_impact: string;
     date: string;
 }

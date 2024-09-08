@@ -6,7 +6,7 @@ import {
   Image,
 } from 'react-native';
 import React, { useCallback, useEffect, useState } from 'react';
-import { getDBConnection, getProducts } from '../services/db-service';
+import { createTable, deleteTable, getDBConnection, getProducts } from '../services/db-service';
 import { Product } from '../models/Product';
 
 const Home = ({navigation}) => {
@@ -15,6 +15,7 @@ const Home = ({navigation}) => {
   const loadDataCallback = useCallback(async () => {
     try {
       const db = await getDBConnection();
+      // await deleteTable(db)
       const storedProducts = await getProducts(db);
       if (storedProducts.length) {
         setProducts(storedProducts);
@@ -35,7 +36,7 @@ const Home = ({navigation}) => {
         {products.length > 0 ? (
           <ScrollView contentContainerStyle={styles.content}>
             {products.map(
-              ({ id, name, date, diabetes_risk, nova }, index) => {
+              ({ id, name, date, diabetes_impact, nova }, index) => {
                 return (
                 <View style={styles.card} key={index}>
                   <View style={styles.cardColumnOne}>
@@ -51,7 +52,7 @@ const Home = ({navigation}) => {
                   </View>
                   <View style={styles.cardColumnThree}>
                     <Text style={styles.dateText}>{ date }</Text>
-                    <Text style={[styles.levelText, diabetes_risk === 'Alto' ? styles.redText : diabetes_risk === 'Medio' ? styles.orangeText : styles.greenText ]} >{ diabetes_risk }</Text>
+                    <Text style={[styles.levelText, diabetes_impact === 'Alto' ? styles.redText : diabetes_impact === 'Medio' ? styles.orangeText : styles.greenText ]} >{ diabetes_impact }</Text>
                   </View>
                 </View>
                 );

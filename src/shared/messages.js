@@ -1,0 +1,13 @@
+export const Novas = {
+    nova_1: "Frescos o Mínimamente Procesados: Este alimento pertenece al Grupo 1. Son alimentos frescos o ligeramente procesados que conservan la mayoría de sus nutrientes originales, ya que no tienen aditivos ni ingredientes añadidos. Son ideales para una dieta saludable. Combinados adecuadamente, estos alimentos forman la base para una alimentación equilibrada y nutritiva",
+    nova_2: "Ingredientes Culinarios Procesados: Este alimento pertenece al Grupo 2. Incluye ingredientes como aceites, sal y azúcar que se utilizan para sazonar y preparar comidas. Aunque son comunes en muchas recetas, es importante usarlos con moderación para mantener una dieta equilibrada. La importancia nutricional de estos ingredientes se evalúa mejor en combinación con otros alimentos.",
+    nova_3:"Alimentos Procesados: Este alimento pertenece al Grupo 3. Son alimentos que han sido procesados con ingredientes como sal o azúcar para conservarlos o mejorar su sabor. Aunque mantienen muchas de sus características originales, es recomendable consumirlos con moderación. Dado que el procesamiento puede desbalancear su valor nutricional, es mejor combinarlos con alimentos del Grupo 1 para una dieta más equilibrada.",
+    nova_4: "Ultraprocesados: Este alimento pertenece al Grupo 4. Son alimentos ultraprocesados, elaborados con ingredientes industriales y aditivos no comunes en la cocina. Suelen tener altos niveles de grasas, azúcares y sal. Para mantener una alimentación saludable, te recomendamos evitar estos productos."
+}
+
+export const SugarLevels = {
+    alto: "Nivel de Azúcar Alto: Este alimento tiene un alto contenido de azúcar y el consumo frecuente de estos alimentos puede aumentar el riesgo de desarrollar diabetes. Te recomendamos limitar su ingesta, optar por opciones más saludables, mantener una dieta equilibrada y consultar con un profesional de la salud puede ayudarte a gestionar tu bienestar",
+    medio: "Nivel de Azúcar Medio: Este producto tiene un contenido de azúcar medio y aunque no representa un riesgo inmediato de diabetes, es importante consumirlo con moderación pues un consumo frecuente puede afectar tu salud a largo plazo. Te sugerimos equilibrar tu dieta con alimentos bajos en azúcar y mantener un estilo de vida activo.",
+    bajo: "Nivel de Azúcar Bajo: Este producto tiene un bajo contenido de azúcar y no representa un riesgo significativo de desarrollar diabetes. Para mantener una buena salud, te recomendamos consumir alimentos frescos y orgánicos y hacer ejercicio regularmente. Seguir una dieta equilibrada y mantener estos hábitos te ayudará a sentirte bien y estar en forma."
+}
+

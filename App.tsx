@@ -15,6 +15,8 @@ import {
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/Ionicons';
+import CameraCropper from './src/components/ImageCropperComponent.tsx';
+import ScanTotalSuggar from './src/components/ScanTotalSugarComponent.tsx';
 
 const Tab = createBottomTabNavigator();
 
@@ -45,12 +47,12 @@ function MyTabs() {
           }
         },
       }}/>
-      <Tab.Screen name="Escanear" component={ ScanIngredientsScreen } options={{
-        tabBarLabel: 'Escanear',
+      <Tab.Screen name="Escanear" component={ CameraCropper } options={{
+        title: 'Escanear Ingredientes',
+        tabBarLabel: 'Escanear Ingredientes',
         tabBarIcon: ({ focused, color, size }) => {
             return <Icon name="camera" size={22}/>
         },
-        tabBarStyle: { display: 'none' },
       }}/>
     </Tab.Navigator>
   );
@@ -70,7 +72,7 @@ const App = () => {
                 }, 
                 headerTintColor: '#fff',
               }} 
-              name="ScanNutritionalFacts" component={ ScanNutriFactsScreen }  />
+              name="ScanNutritionalFacts" component={ ScanTotalSuggar }  />
             <Stack.Screen 
               options={{ 
                 title: 'Resultados', 
